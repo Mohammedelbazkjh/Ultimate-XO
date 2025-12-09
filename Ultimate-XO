@@ -1,0 +1,507 @@
+[index.html](https://github.com/user-attachments/files/24058055/index.html)
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="Gemini_Generated_Image_a3f4e5a3f4e5a3f4.png" href="Gemini_Generated_Image_a3f4e5a3f4e5a3f4.png">
+<title>Ultimate XO</title>
+<style>
+  :root{
+    --bg:#0a0e27;--panel:#0f1724;--accent:#06b6d4;--accent-alt:#8b5cf6;--muted:#94a3b8;--win:#16a34a;--lose:#dc2626;
+    --transition: all 0.3s cubic-bezier(0.4,0,0.2,1)
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#020617 0%, #0a0e27 50%, #1a0f35 100%);font-family:'Inter','Segoe UI',Arial,sans-serif;color:#e6eef6;padding:16px;overflow-x:hidden}
+  
+  .app{width:100%;max-width:1000px;animation:fadeIn 0.6s ease-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+  h1{font-size:24px;margin:0;background:linear-gradient(135deg, var(--accent), var(--accent-alt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+  
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  button{background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(139,92,246,0.1));border:1px solid rgba(6,182,212,0.3);color:var(--muted);padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:500;transition:var(--transition);font-size:13px}
+  button:hover{background:linear-gradient(135deg, rgba(6,182,212,0.2), rgba(139,92,246,0.2));border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(6,182,212,0.15)}
+  button.primary{background:linear-gradient(135deg, var(--accent), #0891b2);color:#022;border:0;font-weight:600;box-shadow:0 4px 15px rgba(6,182,212,0.3)}
+  button.primary:hover{box-shadow:0 6px 20px rgba(6,182,212,0.4);transform:translateY(-2px)}
+  button:active{transform:translateY(0)}
+  
+  .topline{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .status{font-size:15px;color:var(--muted);background:rgba(255,255,255,0.03);padding:6px 12px;border-radius:8px}
+  .status span{color:var(--accent);font-weight:600}
+  
+  .scoreboard{display:flex;gap:10px;flex-wrap:wrap}
+  .scorebox{background:linear-gradient(135deg,rgba(6,182,212,0.08),rgba(139,92,246,0.08));padding:8px 12px;border-radius:10px;font-size:14px;font-weight:500;border:1px solid rgba(6,182,212,0.2);transition:var(--transition)}
+  .scorebox:hover{background:linear-gradient(135deg,rgba(6,182,212,0.12),rgba(139,92,246,0.12));transform:scale(1.05)}
+  .scorebox span{color:var(--accent);font-weight:700;font-size:16px}
+
+  .board-wrap{display:grid;grid-template-columns:1fr 340px;gap:20px}
+  
+  .big{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(139,92,246,0.02));border-radius:16px;border:1px solid rgba(6,182,212,0.1);box-shadow:0 8px 32px rgba(6,182,212,0.05)}
+  
+  .small{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;background:linear-gradient(135deg,rgba(255,255,255,0.02),rgba(139,92,246,0.01));padding:10px;border-radius:12px;transition:var(--transition);border:2px solid transparent;position:relative;overflow:hidden}
+  .small::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at center, rgba(6,182,212,0.1) 0%, transparent 70%);opacity:0;transition:opacity 0.3s}
+  .small.allowed{box-shadow:0 8px 24px rgba(6,182,212,0.15);transform:scale(1.02);border-color:var(--accent);background:linear-gradient(135deg,rgba(6,182,212,0.05),rgba(139,92,246,0.03))}
+  .small.allowed::before{opacity:1}
+  .small.won{background:linear-gradient(135deg,rgba(22,163,74,0.15),rgba(6,182,212,0.05));border-color:var(--win);box-shadow:0 6px 18px rgba(22,163,74,0.1);position:relative}
+  .small.won::after{content:attr(data-winner);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:120px;font-weight:900;opacity:0.15;pointer-events:none;text-shadow:0 0 20px rgba(6,182,212,0.3)}
+
+  .cell{aspect-ratio:1/1;background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center;font-size:28px;border-radius:10px;cursor:pointer;user-select:none;transition:var(--transition);border:1px solid rgba(6,182,212,0.1);position:relative;overflow:hidden;font-weight:700}
+  .cell::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(6,182,212,0.2),transparent);opacity:0;transition:opacity 0.2s}
+  .cell:not(.disabled):hover{background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(6,182,212,0.05));border-color:var(--accent);transform:scale(0.95);box-shadow:inset 0 2px 8px rgba(6,182,212,0.1)}
+  .cell:not(.disabled):hover::before{opacity:1}
+  .cell:active{transform:scale(0.92)}
+  .cell.disabled{cursor:not-allowed;opacity:0.5;background:rgba(255,255,255,0.01)}
+  .cell.x{color:#ff7aa2;text-shadow:0 0 10px rgba(255,122,162,0.3)}
+  .cell.o{color:#86efac;text-shadow:0 0 10px rgba(134,239,172,0.3)}
+
+  .panel{background:linear-gradient(135deg, rgba(15,23,36,0.8), rgba(20,15,40,0.6));padding:16px;border-radius:14px;min-height:250px;border:1px solid rgba(6,182,212,0.1);backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+  .panel h3{margin:0 0 12px 0;color:var(--accent);font-size:16px;font-weight:700}
+  .small-info{font-size:13px;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px;transition:var(--transition)}
+  .small-info span{color:var(--accent);font-weight:600}
+  .small-info:hover{background:rgba(6,182,212,0.05)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+  .message{margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(135deg,rgba(6,182,212,0.08),rgba(139,92,246,0.08));color:var(--muted);border-left:3px solid var(--accent);animation:slideIn 0.3s ease-out;font-size:13px;line-height:1.5}
+  @keyframes slideIn{from{transform:translateX(-20px);opacity:0}to{transform:translateX(0);opacity:1}}
+  
+  .difficulty-selector{display:flex;gap:6px;margin-bottom:12px}
+  .difficulty-btn{padding:6px 10px;font-size:12px;border-radius:8px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);cursor:pointer;transition:var(--transition);color:var(--muted)}
+  .difficulty-btn.active{background:var(--accent);color:#022;font-weight:600;border-color:var(--accent)}
+
+  @media (max-width:1000px){
+    .board-wrap{grid-template-columns:1fr;gap:16px}
+    .big{gap:10px;padding:12px}
+    .panel{order:2}
+  }
+  @media (max-width:640px){
+    h1{font-size:18px}
+    .board-wrap{grid-template-columns:1fr}
+    .big{grid-template-columns:repeat(3,1fr);gap:8px;padding:8px}
+    .cell{font-size:22px}
+    .controls{gap:6px}
+    button{padding:8px 9px;font-size:12px}
+  }
+        .side-ad {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            z-index: 9999;
+        }
+        .right-ad {
+            right: 1000px;
+        }
+        .left-ad {
+            left: 10px;
+        }
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6472628319392250"
+     crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6472628319392250"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- محتوى موقعك هنا -->
+
+    <!-- Right Side Ad -->
+    <div class="side-ad right-ad">
+      <!-- إعلانك هنا -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-6472628319392250"
+        data-ad-slot="1234567890"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>    
+    </div>
+
+    <!--Left Side Ad-->
+    <div class="side-ad left-ad">
+        <!-- إعلانك هنا -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-6472628319392250"
+        data-ad-slot="1234567890"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    </div>
+<div class="app">
+  <header>
+    <div class="topline">
+      <h1>⚔️ Ultimate XO</h1>
+      <div class="status">الدور: <span id="current">X</span></div>
+    </div>
+
+    <div class="controls">
+      <div class="scoreboard">
+        <div class="scorebox">X: <span id="scoreX">0</span></div>
+        <div class="scorebox">O: <span id="scoreO">0</span></div>
+        <div class="scorebox">تعادل: <span id="scoreD">0</span></div>
+      </div>
+
+      <button id="undo">↶ تراجع</button>
+      <button id="restart" class="primary">↻ لعبة جديدة</button>
+      <button id="resetScores">🔄 مسح النقاط</button>
+      <button id="toggleAI">🤖 AI: إيقاف</button>
+      <button id="soundToggle">🔊 صوت: تشغيل</button>
+    </div>
+  </header>
+
+  <div class="board-wrap">
+    <div class="big" id="bigBoard"></div>
+
+    <aside class="panel">
+      <h3>📊 معلومات اللعبة</h3>
+      <div class="small-info">
+        <span>النمط:</span>
+        <span id="mode">لاعب × لاعب</span>
+      </div>
+      <div class="small-info">
+        <span>اللوحة المسموح:</span>
+        <span id="allowed">كل اللوحات</span>
+      </div>
+
+      <div class="difficulty-selector" id="difficultySelector" style="display:none">
+        <button class="difficulty-btn active" data-level="1">سهل</button>
+        <button class="difficulty-btn" data-level="2">متوسط</button>
+        <button class="difficulty-btn" data-level="3">صعب</button>
+      </div>
+
+      <div class="actions">
+        <button id="share">📋 مشاركة</button>
+      </div>
+
+      <div class="message" id="message">👋 ابدأ اللعب - يلعب X أولاً.</div>
+    </aside>
+  </div>
+</div>
+
+<audio id="clickSound"><source src="data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAA" type="audio/wav"></audio>
+<audio id="winSound"><source src="data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAA" type="audio/wav"></audio>
+
+<script>
+const bigEl = document.getElementById('bigBoard');
+const currentEl = document.getElementById('current');
+const allowedEl = document.getElementById('allowed');
+const modeEl = document.getElementById('mode');
+const messageEl = document.getElementById('message');
+const scoreX = document.getElementById('scoreX');
+const scoreO = document.getElementById('scoreO');
+const scoreD = document.getElementById('scoreD');
+const undoBtn = document.getElementById('undo');
+const restartBtn = document.getElementById('restart');
+const resetScoresBtn = document.getElementById('resetScores');
+const toggleAIBtn = document.getElementById('toggleAI');
+const soundToggleBtn = document.getElementById('soundToggle');
+const clickSound = document.getElementById('clickSound');
+const winSound = document.getElementById('winSound');
+const difficultySelector = document.getElementById('difficultySelector');
+
+let soundOn = true;
+let isAIMode = false;
+let aiDifficulty = 2; // 1=easy, 2=medium, 3=hard
+let current = 'X';
+let boards = Array.from({length:9}, ()=>Array(9).fill(''));
+let big = Array(9).fill(null);
+let allowed = null;
+let history = [];
+
+const LS = 'ultimate_xo_scores_v2';
+const saved = JSON.parse(localStorage.getItem(LS) || '{}');
+let scores = {X: saved.X||0, O: saved.O||0, D: saved.D||0};
+renderScores();
+
+function renderScores(){
+  scoreX.textContent = scores.X;
+  scoreO.textContent = scores.O;
+  scoreD.textContent = scores.D;
+  localStorage.setItem(LS, JSON.stringify(scores));
+}
+
+function init(){
+  bigEl.innerHTML = '';
+  for(let b = 0; b < 9; b++){
+    const small = document.createElement('div');
+    small.className = 'small';
+    small.dataset.board = b;
+    for(let c = 0; c < 9; c++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.board = b;
+      cell.dataset.cell = c;
+      cell.onclick = () => onCellClick(b, c);
+      small.appendChild(cell);
+    }
+    bigEl.appendChild(small);
+  }
+  updateUI();
+}
+
+function onCellClick(b, c){
+  if((allowed !== null && allowed !== b) || big[b] || boards[b][c]) return;
+  playMove(b, c, current, true);
+}
+
+function playMove(b, c, player, record = true){
+  if(record) history.push({
+    boards: boards.map(x => x.slice()),
+    big: big.slice(),
+    allowed,
+    current
+  });
+  
+  boards[b][c] = player;
+  
+  if(soundOn) {
+    try{ clickSound.currentTime = 0; clickSound.play(); }catch(e){}
+  }
+
+  const sw = checkWin(boards[b]);
+  if(sw){ 
+    big[b] = sw; 
+    markBoardWon(b, sw); 
+  }
+
+  const bw = checkWin(big);
+  if(bw){
+    finishGame(bw);
+    return;
+  }
+
+  // Check for draw
+  let allFilled = true;
+  for(let i = 0; i < 9; i++){
+    if(!big[i]){
+      const boardFilled = boards[i].every(cell => cell !== '');
+      if(!boardFilled){ allFilled = false; break; }
+    }
+  }
+  if(allFilled){
+    finishGame('D');
+    return;
+  }
+
+  allowed = big[c] ? null : c;
+  if(allowed === null) allowedEl.textContent = 'كل اللوحات';
+  else allowedEl.textContent = (allowed + 1);
+
+  current = current === 'X' ? 'O' : 'X';
+  currentEl.textContent = current;
+  updateUI();
+
+  if(isAIMode && current === 'O') setTimeout(aiPlay, 400);
+}
+
+function aiPlay(){
+  let targetBoards = allowed === null ? getAvailableBoards() : [allowed];
+  let chosen = null;
+  let chosenMove = null;
+
+  if(aiDifficulty >= 3){
+    // Hard: Try to win
+    for(const b of targetBoards){
+      let winMove = findWinningMove(boards[b], 'O');
+      if(winMove !== null){ chosen = b; chosenMove = winMove; break; }
+    }
+    // Hard: Block player's win
+    if(chosen === null){
+      for(const b of targetBoards){
+        let block = findWinningMove(boards[b], 'X');
+        if(block !== null){ chosen = b; chosenMove = block; break; }
+      }
+    }
+  }
+
+  if(chosen === null && aiDifficulty >= 2){
+    // Medium: Center
+    for(const b of targetBoards){
+      if(boards[b][4] === ''){ chosen = b; chosenMove = 4; break; }
+    }
+  }
+
+  if(chosen === null){
+    // Easy/Medium: Corners
+    for(const b of targetBoards){
+      const corners = [0,2,6,8].filter(i => boards[b][i] === '');
+      if(corners.length){ chosen = b; chosenMove = corners[Math.floor(Math.random() * corners.length)]; break; }
+    }
+  }
+
+  if(chosen === null){
+    // Random
+    for(const b of targetBoards){
+      const free = boards[b].map((v,i) => v === '' ? i : null).filter(v => v !== null);
+      if(free.length){ chosen = b; chosenMove = free[Math.floor(Math.random() * free.length)]; break; }
+    }
+  }
+
+  if(chosen === null){
+    const ab = getAvailableBoards();
+    if(ab.length){
+      chosen = ab[Math.floor(Math.random() * ab.length)];
+      const free = boards[chosen].map((v,i) => v === '' ? i : null).filter(v => v !== null);
+      chosenMove = free[Math.floor(Math.random() * free.length)];
+    }
+  }
+
+  if(chosen !== null && chosenMove !== null) playMove(chosen, chosenMove, 'O', true);
+}
+
+function getAvailableBoards(){
+  const arr = [];
+  for(let i = 0; i < 9; i++){
+    if(!big[i]){
+      const isFilled = boards[i].every(cell => cell !== '');
+      if(!isFilled) arr.push(i);
+    }
+  }
+  return arr;
+}
+
+function findWinningMove(bArr, player){
+  for(let i = 0; i < 9; i++){
+    if(bArr[i] === ''){
+      const copy = bArr.slice();
+      copy[i] = player;
+      if(checkWin(copy) === player) return i;
+    }
+  }
+  return null;
+}
+
+function checkWin(arr){
+  const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const [a,b,c] of lines){
+    if(arr[a] && arr[a] === arr[b] && arr[a] === arr[c]) return arr[a];
+  }
+  return null;
+}
+
+function markBoardWon(b, w){
+  const boardEl = document.querySelectorAll('.small')[b];
+  boardEl.classList.add('won');
+  boardEl.setAttribute('data-winner', w);
+  boardEl.querySelectorAll('.cell').forEach(e => {
+    e.classList.add('disabled');
+    e.textContent = '';
+    e.classList.remove('x', 'o');
+  });
+}
+
+function finishGame(winner){
+  if(winner === 'D'){
+    messageEl.textContent = '🤝 انتهت المباراة: تعادل';
+    scores.D++;
+  } else {
+    messageEl.textContent = `🎉 الفائز: ${winner}`;
+    scores[winner]++;
+    if(soundOn){
+      try{ winSound.currentTime = 0; winSound.play(); }catch(e){}
+    }
+  }
+  renderScores();
+  document.querySelectorAll('.cell').forEach(e => e.classList.add('disabled'));
+}
+
+function updateUI(){
+  document.querySelectorAll('.cell').forEach(el => {
+    const b = +el.dataset.board;
+    const c = +el.dataset.cell;
+    el.textContent = boards[b][c];
+    el.classList.remove('x', 'o');
+    if(boards[b][c] === 'X') el.classList.add('x');
+    if(boards[b][c] === 'O') el.classList.add('o');
+    if(big[b] || boards[b][c] || (allowed !== null && allowed !== b)) el.classList.add('disabled');
+    else el.classList.remove('disabled');
+  });
+
+  document.querySelectorAll('.small').forEach((sm, i) => {
+    sm.classList.remove('allowed', 'won');
+    if(big[i]) sm.classList.add('won');
+    else if(allowed === null || allowed === i) sm.classList.add('allowed');
+  });
+
+  modeEl.textContent = isAIMode ? 'لاعب × حاسوب' : 'لاعب × لاعب';
+  if(allowed === null) allowedEl.textContent = 'كل اللوحات';
+  else allowedEl.textContent = (allowed + 1);
+}
+
+undoBtn.addEventListener('click', () => {
+  if(!history.length) return;
+  const last = history.pop();
+  boards = last.boards.map(x => x.slice());
+  big = last.big.slice();
+  allowed = last.allowed;
+  current = last.current;
+  currentEl.textContent = current;
+  messageEl.textContent = '↶ تم التراجع';
+  updateUI();
+});
+
+restartBtn.addEventListener('click', () => {
+  boards = Array.from({length:9}, () => Array(9).fill(''));
+  big = Array(9).fill(null);
+  allowed = null;
+  current = 'X';
+  history = [];
+  messageEl.textContent = '👋 لعبة جديدة - يلعب X أولاً';
+  currentEl.textContent = current;
+  updateUI();
+});
+
+resetScoresBtn.addEventListener('click', () => {
+  scores = {X:0, O:0, D:0};
+  renderScores();
+  messageEl.textContent = '🔄 تم مسح النقاط';
+});
+
+toggleAIBtn.addEventListener('click', () => {
+  isAIMode = !isAIMode;
+  toggleAIBtn.textContent = isAIMode ? '🤖 AI: تشغيل' : '🤖 AI: إيقاف';
+  difficultySelector.style.display = isAIMode ? 'flex' : 'none';
+  if(isAIMode && current === 'O') setTimeout(aiPlay, 250);
+  messageEl.textContent = isAIMode ? '🤖 تم تشغيل AI' : '👤 وضع اللاعب';
+  updateUI();
+});
+
+soundToggleBtn.addEventListener('click', () => {
+  soundOn = !soundOn;
+  soundToggleBtn.textContent = soundOn ? '🔊 صوت: تشغيل' : '🔇 صوت: إيقاف';
+  messageEl.textContent = soundOn ? '🔊 الأصوات مشغلة' : '🔇 الأصوات معطلة';
+});
+
+document.querySelectorAll('.difficulty-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    aiDifficulty = +e.target.dataset.level;
+    const levels = ['سهل', 'متوسط', 'صعب'];
+    messageEl.textContent = `⚙️ الصعوبة: ${levels[aiDifficulty - 1]}`;
+  });
+});
+
+document.getElementById('share').addEventListener('click', () => {
+  try{
+    navigator.clipboard.writeText(location.href);
+    messageEl.textContent = '📋 تم نسخ الرابط';
+  }catch(e){
+    messageEl.textContent = '❌ فشل النسخ';
+  }
+});
+
+init();
+
+window.ULT = {boards, big, restart: ()=>restartBtn.click(), undo: ()=>undoBtn.click()};
+</script>
+</body>
+</html>
