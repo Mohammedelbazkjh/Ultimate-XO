@@ -98,10 +98,6 @@
             left: 10px;
         }
 </style>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6472628319392250"
-     crossorigin="anonymous"></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6472628319392250"
-     crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- محتوى موقعك هنا -->
@@ -109,31 +105,11 @@
     <!-- Right Side Ad -->
     <div class="side-ad right-ad">
       <!-- إعلانك هنا -->
-    <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-6472628319392250"
-        data-ad-slot="1234567890"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>    
     </div>
 
     <!--Left Side Ad-->
     <div class="side-ad left-ad">
         <!-- إعلانك هنا -->
-    <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-6472628319392250"
-        data-ad-slot="1234567890"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
     </div>
 <div class="app">
   <header>
